@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Started - JCU Founders</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .checkout-page{
+      min-height:100vh;
+      background:#e8f1fb;
+      padding:70px 8%;
+    }
+
+    .checkout-box{
+      background:white;
+      max-width:1100px;
+      margin:auto;
+      padding:50px;
+      border-radius:12px;
+      box-shadow:0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    .checkout-title{
+      text-align:center;
+      color:#002b5c;
+      margin-bottom:40px;
+      font-size:38px;
+    }
+
+    .checkout-content{
+      display:grid;
+      grid-template-columns:2fr 1fr;
+      gap:40px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:6px;
+      font-weight:bold;
+    }
+
+    input, select{
+      width:100%;
+      padding:14px;
+      margin-bottom:18px;
+      border:1px solid #ddd;
+      border-radius:8px;
+      font-size:15px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:15px;
+    }
+
+    .summary-section{
+      background:#f5f7fa;
+      padding:30px;
+      border-radius:12px;
+      height:fit-content;
+    }
+
+    .summary-section h3{
+      color:#002b5c;
+      margin-bottom:20px;
+    }
+
+    .summary-item{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:15px;
+      color:#444;
+    }
+
+    .total{
+      border-top:1px solid #ddd;
+      padding-top:18px;
+      font-size:20px;
+      font-weight:bold;
+      color:#002b5c;
+    }
+
+    .subscribe-btn{
+      width:100%;
+      background:#002b5c;
+      color:white;
+      padding:16px;
+      border:none;
+      border-radius:8px;
+      font-size:18px;
+      font-weight:bold;
+      cursor:pointer;
+      margin-top:20px;
+    }
+
+    .stripe-note{
+      background:#f5f7fa;
+      border-left:4px solid #f2c400;
+      padding:14px 16px;
+      border-radius:8px;
+      color:#333;
+      line-height:1.5;
+      margin-bottom:18px;
+    }
+
+    @media(max-width:768px){
+      .checkout-content{
+        grid-template-columns:1fr;
+      }
+
+      .row{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<nav>
+
+  <div class="nav-left">
+    <a href="./index.html" class="logo-link">
+      <img src="./images/FIR_logo HD JCU.jpg" alt="JCU Logo" class="logo">
+    </a>
+    <h2>JCU Founders</h2>
+  </div>
+
+  <div class="nav-right">
+
+    <a href="index.html">Home</a>
+    <a href="plans.html">Membership Plans</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+
+    <button class="back-button"
+            onclick="history.back()">
+      ← Back
+    </button>
+
+  </div>
+
+</nav>
+
+<section class="checkout-page">
+
+  <div class="checkout-box">
+
+    <h1 class="checkout-title">Start Your Membership</h1>
+
+    <div class="checkout-content">
+
+      <div>
+
+        <h3>Account Information</h3>
+
+        <label>Full Name</label>
+        <input id="fullName" type="text" placeholder="Enter your full name">
+
+        <label>Email Address</label>
+        <input id="emailAddress" type="email" placeholder="Enter your email">
+
+        <label>Organisation / Company</label>
+        <input id="organisationName" type="text" placeholder="Enter organisation name">
+
+        <label>Select Membership Plan</label>
+        <select id="planSelect" onchange="updateSummary()">
+          <option value="freemium">Freemium - $0/month</option>
+          <option value="premium">Premium - $169/month</option>
+          <option value="professional">Professional - $269/month</option>
+          <option value="enterprise">Enterprise - $369/month</option>
+          <option value="elite">Elite - $469/month</option>
+        </select>
+
+        <h3>Secure Payment</h3>
+
+        <p class="stripe-note">
+          Payments are processed securely through Stripe. After clicking Subscribe,
+          you will be redirected to the Stripe checkout page for the selected membership plan.
+        </p>
+
+      </div>
+
+      <div class="summary-section">
+
+        <h3>Membership Summary</h3>
+
+        <div class="summary-item">
+          <span>Selected Plan</span>
+          <strong id="summaryPlan">Freemium</strong>
+        </div>
+
+        <div class="summary-item">
+          <span>Billing</span>
+          <strong>Monthly</strong>
+        </div>
+
+        <div class="summary-item">
+          <span>Membership Fee</span>
+          <strong id="summaryFee">$0 AUD</strong>
+        </div>
+
+        <div class="summary-item total">
+          <span>Total</span>
+          <span id="summaryTotal">$0 AUD</span>
+        </div>
+
+        <button type="button" class="subscribe-btn" onclick="goToStripeCheckout()">Subscribe</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<footer>
+  © 2026 JCU Founders-in-Residence Commercialisation
+</footer>
+
+<script>
+  /*
+    IMPORTANT:
+    Replace the # values below with your real Stripe Payment Links.
+    Example: professional: "https://buy.stripe.com/test_xxxxxxxxx"
+  */
+  const stripePaymentLinks = {
+    freemium: "https://buy.stripe.com/test_fZu8wOeUd03deREbQ00VO01",
+    premium: "https://buy.stripe.com/test_eVq7sK3bv17h7pcdY80VO00",
+    professional: "https://buy.stripe.com/test_4gM7sK27reY7gZMbQ00VO02",
+    enterprise: "https://buy.stripe.com/test_8x26oGcM503ddNA8DO0VO03",
+    elite: "https://buy.stripe.com/test_9B66oGh2l4jt8tgg6g0VO04"
+  };
+
+  const planData = {
+    freemium: { name: "Freemium", price: "$0 AUD" },
+    premium: { name: "Premium", price: "$169 AUD" },
+    professional: { name: "Professional", price: "$269 AUD" },
+    enterprise: { name: "Enterprise", price: "$369 AUD" },
+    elite: { name: "Elite", price: "$469 AUD" }
+  };
+
+  function updateSummary(){
+    const selectedPlan = document.getElementById("planSelect").value;
+    const plan = planData[selectedPlan];
+
+    document.getElementById("summaryPlan").textContent = plan.name;
+    document.getElementById("summaryFee").textContent = plan.price;
+    document.getElementById("summaryTotal").textContent = plan.price;
+  }
+
+  function setPlanFromUrl(){
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get("plan");
+    const planSelect = document.getElementById("planSelect");
+
+    if(plan && planData[plan]){
+      planSelect.value = plan;
+    }
+
+    updateSummary();
+  }
+
+  function goToStripeCheckout(){
+    const selectedPlan = document.getElementById("planSelect").value;
+    const email = document.getElementById("emailAddress").value.trim();
+    const paymentLink = stripePaymentLinks[selectedPlan];
+
+    if(selectedPlan === "freemium"){
+      showPaymentPopup("Your free membership request has been received.");
+      return;
+    }
+
+    if(!paymentLink || paymentLink.startsWith("#")){
+      alert("Stripe payment link for " + planData[selectedPlan].name + " has not been added yet. Please replace the placeholder link in get-started.html.");
+      return;
+    }
+
+    let checkoutUrl = paymentLink;
+    if(email){
+      const separator = checkoutUrl.includes("?") ? "&" : "?";
+      checkoutUrl += separator + "prefilled_email=" + encodeURIComponent(email);
+    }
+
+    window.location.href = checkoutUrl;
+  }
+
+  window.addEventListener("DOMContentLoaded", setPlanFromUrl);
+</script>
+
+
+
+<!-- PAYMENT SUCCESS POPUP -->
+<div class="popup-overlay" id="paymentPopup">
+  <div class="popup-box">
+    <div class="popup-icon">✓</div>
+
+    <h2>Payment is done</h2>
+
+    <p>
+      Your subscription has been completed successfully.
+    </p>
+
+    <button type="button" class="popup-btn" onclick="closePaymentPopup()">
+      OK
+    </button>
+  </div>
+</div>
+
+<script>
+  function showPaymentPopup(message){
+    var popup = document.getElementById("paymentPopup");
+    if(message){
+      var text = popup.querySelector("p");
+      if(text){ text.textContent = message; }
+    }
+    if(popup){
+      popup.style.display = "flex";
+    }
+  }
+
+  function closePaymentPopup(){
+    var popup = document.getElementById("paymentPopup");
+    if(popup){
+      popup.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>
